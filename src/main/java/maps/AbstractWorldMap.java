@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import static java.lang.Math.ceil;
+
 
 abstract public class AbstractWorldMap implements IWorldMap {
     protected List<Animal> animals = new ArrayList<>();
@@ -20,6 +22,8 @@ abstract public class AbstractWorldMap implements IWorldMap {
     protected AbstractWorldMap(int mapHeight, int mapWidth) {
         this.mapHeight = mapHeight;
         this.mapWidth = mapWidth;
+
+        calculateGreenBelt();
     }
 
     public List<Animal> getAnimals() {
@@ -36,7 +40,7 @@ abstract public class AbstractWorldMap implements IWorldMap {
 
     @Override
     public String toString(){
-        return mapVisualizer.draw(new Vector2d(0,0), new Vector2d(5,5));
+        return mapVisualizer.draw(new Vector2d(0,0), new Vector2d(this.mapWidth,this.mapHeight));
     }
 
     @Override
@@ -57,6 +61,28 @@ abstract public class AbstractWorldMap implements IWorldMap {
             }
         }
         return null;
+    }
+
+    private void calculateGreenBelt() {
+        int greenHeight = (int)ceil(0.2 * mapHeight);
+
+        // Green belt borders
+        int greenLowerX;
+        int greenUpperX;
+
+        if ((mapHeight + 1)%2 == 0){
+            if (greenHeight % 2 == 1) {
+                greenHeight += 1;
+            }
+            greenLowerX = (mapHeight + 1)/2 - greenHeight/2;
+        }else {
+            greenLowerX = (mapHeight)/2 - greenHeight/2;
+            if (greenHeight%2==0){
+                greenHeight += 1;
+            }
+        }
+        // Upper x boundary of green belt = lower border + its height
+        greenUpperX = greenLowerX + greenHeight - 1;
     }
 
     /**
@@ -85,17 +111,7 @@ abstract public class AbstractWorldMap implements IWorldMap {
                     Animal mother = possibleParents.get(0);
                     Animal father = possibleParents.get(1);
 
-                    //TODO - IN ANIMAL CLASS
-                    //      make this method in Animal class
-                    //      (part of energy that child gets from certain parent)
-
-                    int childEnergy;
-
-                    if (mother.energy >= father.energy){
-                        childEnergy = (int) (0.75 * mother.energy + 0.25 * father.energy);
-                    } else {
-                        childEnergy = (int) (0.25 * mother.energy + 0.75 * father.energy);
-                    }
+                    int childEnergy = copulationLossEnergy * 2;
 
                     mother.energy -= copulationLossEnergy;
                     father.energy -= copulationLossEnergy;

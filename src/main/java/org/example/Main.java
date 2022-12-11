@@ -10,7 +10,7 @@ import simulation.SimulationEngine;
 
 public class Main {
     public static void main(String[] args) {
-        AbstractWorldMap map = new NetherMap(5,5);
+        AbstractWorldMap map = new NetherMap(6,6);
         Vector2d[] positions = { new Vector2d(2,2), new Vector2d(3,4), new Vector2d(2,2) };
         // Randomowe dane aby sprawdzic czy dziala
         IEngine engine = new SimulationEngine(map, positions, 30, 15);
