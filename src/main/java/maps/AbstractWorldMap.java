@@ -4,15 +4,19 @@ import elements.Animal;
 import elements.Vector2d;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
+import java.util.Map;
 
 import static java.lang.Math.ceil;
 
 
 abstract public class AbstractWorldMap implements IWorldMap {
     protected List<Animal> animals = new ArrayList<>();
-    private int copulationEnergy;
+    private Map<Vector2d, Integer> emptyGreenBeltFields = new HashMap<>();
+    private Map<Vector2d, Integer> emptyNonGreenFields = new HashMap<>();
+
+    private int copulationEnergy, grassPerDay, greenLowerY, greenUpperY;
     protected int copulationLossEnergy;
     MapVisualizer mapVisualizer = new MapVisualizer(this);
     public final int mapHeight, mapWidth;
@@ -37,6 +41,7 @@ abstract public class AbstractWorldMap implements IWorldMap {
     public void setCopulationLossEnergy(int copulationLossEnergy){
         this.copulationLossEnergy = copulationLossEnergy;
     }
+    public void setGrassPerDay(int grassPerDay) { this.grassPerDay = grassPerDay; }
 
     @Override
     public String toString(){
@@ -63,32 +68,63 @@ abstract public class AbstractWorldMap implements IWorldMap {
         return null;
     }
 
+    /**
+     * Calculates 20% of map and its boundaries for green belt
+     */
     private void calculateGreenBelt() {
-        int greenHeight = (int)ceil(0.2 * mapHeight);
+        int greenHeight = ((int)ceil(0.2 * (mapHeight+1) * (mapWidth+1))) / (mapWidth+1);
 
-        // Green belt borders
-        int greenLowerX;
-        int greenUpperX;
+        // If greenHeight(mod mapWidth) >=5 then adding one moge greenBelt would be closer to 20% of the map
+        if (((int)ceil(0.2 * (mapHeight+1) * (mapWidth+1))) % (mapWidth+1) >= 5) { greenHeight += 1;}
 
         if ((mapHeight + 1)%2 == 0){
-            if (greenHeight % 2 == 1) {
-                greenHeight += 1;
-            }
-            greenLowerX = (mapHeight + 1)/2 - greenHeight/2;
+            this.greenLowerY = (mapHeight + 1)/2 - greenHeight/2;
         }else {
-            greenLowerX = (mapHeight)/2 - greenHeight/2;
-            if (greenHeight%2==0){
-                greenHeight += 1;
+            this.greenLowerY = (mapHeight)/2 - greenHeight/2;
+        }
+        this.greenUpperY = greenLowerY + greenHeight - 1;
+
+        //Initialize empty fields on greenBelt
+        for (int y = greenLowerY; y <= greenUpperY; y ++){
+            for (int x = 0; x <= mapWidth; x++) {
+                emptyGreenBeltFields.put(new Vector2d(x,y),0);
             }
         }
-        // Upper x boundary of green belt = lower border + its height
-        greenUpperX = greenLowerX + greenHeight - 1;
+
+        //Initialize empty fields outside greenBelt
+        for (int y = 0; y <= mapHeight; y ++){
+            if ((y >=0 && y < greenLowerY) || (y > greenUpperY && y <= mapHeight)){
+                for (int x = 0; x <= mapWidth; x++) {
+                    emptyNonGreenFields.put(new Vector2d(x,y),0);
+                }
+            }
+        }
+    }
+
+    private void greenGrow(int howManyGreen) {
+        for (int x=0; x < howManyGreen; x++) {
+            int randomField = (int)(Math.random()*10);
+
+            // 20% chance to spawn Grass outside the green belt
+            if (randomField < 2) {
+                if(emptyNonGreenFields.size() > 0){
+                    //TODO - remove non-empty fields
+                    //     - randomly pick field for grass growth with the least death count
+                }
+            // 80% chance to spawn Grass inside the green belt
+            }else {
+                if (emptyGreenBeltFields.size() > 0){
+                    //TODO - remove non-empty fields
+                    //     - randomly pick field for grass growth with the least death count
+                }
+            }
+        }
     }
 
     /**
      * Handle the copulation of animals on the map.
      */
-    public void copulation() {
+    private void copulation() {
         for (int x=0; x <= mapWidth; x++ ){
             for (int y=0; y <= mapHeight; y++){
 
@@ -130,11 +166,32 @@ abstract public class AbstractWorldMap implements IWorldMap {
     }
 
     /**
+     * Updates number of deaths on certain position
+     * @param position
+     */
+    private void updateToxicFields(Vector2d position) {
+        if (position.y <= greenUpperY && position.y >= greenLowerY){
+            emptyGreenBeltFields.put(position,emptyGreenBeltFields.get(position) + 1);
+        }else {
+            emptyNonGreenFields.put(position,emptyNonGreenFields.get(position) + 1);
+        }
+    }
+
+    /**
      * Removes dead animals from map, and collects data about poisoned fields.
      */
     public void removeAnimals() {
+        List<Animal> animalsToRemove = new ArrayList<>();
+
         for (Animal animal: animals) {
             if (animal.getEnergy() == 0) {
+                animalsToRemove.add(animal);
+                updateToxicFields(animal.getPosition());
+            }
+        }
+
+        if(animalsToRemove.size() > 0){
+            for (Animal animal: animalsToRemove) {
                 animals.remove(animal);
             }
         }
@@ -154,5 +211,7 @@ abstract public class AbstractWorldMap implements IWorldMap {
         removeAnimals();
         animalMoveOnMap();
         copulation();
+//        System.out.println(emptyGreenBeltFields);
+//        System.out.println(emptyNonGreenFields);
     }
 }
