@@ -1,4 +1,4 @@
-package simulation;
+package interfaces;
 
 /**
  * The interface responsible for managing the moves of the animals.

@@ -2,19 +2,22 @@ package maps;
 
 import elements.Animal;
 import elements.Vector2d;
+import interfaces.IMapType;
+import simulation.SimulationVariables;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * Map that enables animals to cross the border and appear on its opposite side.
  **/
-public class GlobeMap extends AbstractWorldMap {
-    public GlobeMap(int mapHeight, int mapWidth) {
-        super(mapHeight, mapWidth);
-    }
-
+public class GlobeMap implements IMapType {
     @Override
-    public void animalMoveOnMap() {
+    public void animalMoveOnMap(WorldMap map) {
+        int mapWidth = map.mapWidth;
+        int mapHeight = map.mapHeight;
+        List<Animal> animals = map.getAnimals();
+
         for (Animal animal: animals) {
 
             Vector2d position = animal.getPosition();

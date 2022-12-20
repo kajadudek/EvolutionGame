@@ -2,19 +2,18 @@ package simulation;
 
 import elements.Animal;
 import elements.Vector2d;
-import maps.AbstractWorldMap;
+import interfaces.IEngine;
+import maps.WorldMap;
 
 import java.util.List;
 
-public class SimulationEngine implements IEngine{
+public class SimulationEngine implements IEngine {
     List<Animal> animals;
-    private AbstractWorldMap map;
-
-    public SimulationEngine(AbstractWorldMap map, Vector2d[] animalsPositions, int copulationEnergy, int copulationLossEnergy, int grassPerDay) {
-        this.map = map;
-        this.map.setCopulationEnergy(copulationEnergy);
-        this.map.setCopulationLossEnergy(copulationLossEnergy);
-        this.map.setGrassPerDay(grassPerDay);
+    private WorldMap map;
+    public SimulationEngine(SimulationVariables settings, Vector2d[] animalsPositions){
+        this.map = new WorldMap(settings);
+        this.map.setCopulationLossEnergy(settings.copulationLossEnergy);
+        this.map.setCopulationEnergy(settings.copulationMinEnergy);
         this.animals = map.getAnimals();
 
         for (Vector2d animalsPosition : animalsPositions) {
@@ -28,6 +27,15 @@ public class SimulationEngine implements IEngine{
 
     @Override
     public void run() {
-        map.nextDay();
+        map.removeAnimals();
+        for (int i=0; i < 10; i++){
+            for(Animal animal: animals) {
+//                System.out.print(animal.position + " -> ");
+//                animal.getPosition().y += 1;
+                System.out.println(animal.position);
+            }
+            map.nextDay();
+            System.out.println(map);
+        }
     }
 }

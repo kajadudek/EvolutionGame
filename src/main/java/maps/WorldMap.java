@@ -3,29 +3,36 @@ package maps;
 import elements.Animal;
 import elements.Grass;
 import elements.Vector2d;
+import interfaces.IMapType;
+import interfaces.IWorldMap;
+import simulation.SimulationVariables;
 
-import java.sql.Array;
 import java.util.*;
 
 import static java.lang.Math.ceil;
 
-abstract public class AbstractWorldMap implements IWorldMap {
+public class WorldMap implements IWorldMap {
     protected List<Animal> animals = new ArrayList<>();
     protected List<Grass> grasses = new ArrayList<>();
-    private List<Vector2d> emptyGreenBeltField = new ArrayList<>();
-    private List<Vector2d> emptyNonGreenField = new ArrayList<>();
-    private Map<Vector2d, Integer> deathCounter = new HashMap<>();
-    private int copulationEnergy, grassPerDay, greenLowerY, greenUpperY;
+    List<Vector2d> emptyGreenBeltField = new ArrayList<>();
+    List<Vector2d> emptyNonGreenField = new ArrayList<>();
+    Map<Vector2d, Integer> deathCounter = new HashMap<>();
+    private int copulationEnergy, grassPerDay = 2, greenLowerY, greenUpperY;
     private boolean growOnGreenBelt = true;
     protected int copulationLossEnergy;
     MapVisualizer mapVisualizer = new MapVisualizer(this);
-    public final int mapHeight, mapWidth;
+    public int mapHeight;
+    public int mapWidth;
+    public IMapType map;
+    public final SimulationVariables settings;
 
-    abstract public void animalMoveOnMap();
+//    abstract public void animalMoveOnMap();
 
-    protected AbstractWorldMap(int mapHeight, int mapWidth) {
-        this.mapHeight = mapHeight;
-        this.mapWidth = mapWidth;
+    public WorldMap(SimulationVariables settings) {
+        this.settings = settings;
+        this.mapHeight = settings.mapHeight;
+        this.mapWidth = settings.mapWidth;
+        this.map = (IMapType) settings.mapType;
 
         calculateGreenBelt();
     }
@@ -109,26 +116,12 @@ abstract public class AbstractWorldMap implements IWorldMap {
         }
     }
 
-    private void greenGrow(int howManyGreen) {
+    private void greenGrow(int greenPerDay) {
         if (growOnGreenBelt) {
-            for (int x=0; x < howManyGreen; x++) {
+            for (int x=0; x < greenPerDay; x++) {
                 int randomField = (int)(Math.random()*10);
-
                 // 20% chance to spawn Grass outside the green belt
                 if (randomField < 2) {
-                    if(emptyGreenBeltField.size() > 0){
-                        Collections.shuffle(emptyGreenBeltField);
-                        this.grasses.add(new Grass(emptyGreenBeltField.get(0)));
-                        emptyGreenBeltField.remove(0);
-                    } else {
-                        if (emptyNonGreenField.size() > 0){
-                            Collections.shuffle(emptyNonGreenField);
-                            this.grasses.add(new Grass(emptyNonGreenField.get(0)));
-                            emptyNonGreenField.remove(0);
-                            }
-                    }
-                // 80% chance to spawn Grass inside the green belt
-                }else {
                     if (emptyNonGreenField.size() > 0){
                         Collections.shuffle(emptyNonGreenField);
                         this.grasses.add(new Grass(emptyNonGreenField.get(0)));
@@ -138,6 +131,19 @@ abstract public class AbstractWorldMap implements IWorldMap {
                             Collections.shuffle(emptyGreenBeltField);
                             this.grasses.add(new Grass(emptyGreenBeltField.get(0)));
                             emptyGreenBeltField.remove(0);
+                        }
+                    }
+                // 80% chance to spawn Grass inside the green belt
+                }else {
+                    if(emptyGreenBeltField.size() > 0){
+                        Collections.shuffle(emptyGreenBeltField);
+                        this.grasses.add(new Grass(emptyGreenBeltField.get(0)));
+                        emptyGreenBeltField.remove(0);
+                    } else {
+                        if (emptyNonGreenField.size() > 0) {
+                            Collections.shuffle(emptyNonGreenField);
+                            this.grasses.add(new Grass(emptyNonGreenField.get(0)));
+                            emptyNonGreenField.remove(0);
                         }
                     }
                 }
@@ -214,7 +220,8 @@ abstract public class AbstractWorldMap implements IWorldMap {
 
         if(animalsToRemove.size() > 0){
             for (Animal animal: animalsToRemove) {
-                animals.remove(animal);
+                this.animals.remove(animal);
+                System.out.println(this.animals);
             }
         }
         //TODO - get places with the most animals' death counter. (Important for grass growth)
@@ -231,9 +238,8 @@ abstract public class AbstractWorldMap implements IWorldMap {
     public void nextDay(){
         System.out.println("nastepny dzien");
         removeAnimals();
-        animalMoveOnMap();
         copulation();
+        this.map.animalMoveOnMap(this);
         greenGrow(this.grassPerDay);
-        System.out.println(deathCounter);
     }
 }

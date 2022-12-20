@@ -1,7 +1,5 @@
 package elements;
 
-import maps.IWorldMap;
-
 public class Animal {
     public Vector2d position;
     public int energy;

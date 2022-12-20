@@ -1,6 +1,7 @@
 package maps;
 
 import elements.Vector2d;
+import interfaces.IWorldMap;
 
 /**
  * The map visualizer converts the {@link IWorldMap} map into a string
