@@ -31,8 +31,8 @@ public class SimulationEngine implements IEngine {
         for (int i=0; i < 10; i++){
             for(Animal animal: animals) {
 //                System.out.print(animal.position + " -> ");
-//                animal.getPosition().y += 1;
-                System.out.println(animal.position);
+                animal.getPosition().y += 1;
+//                System.out.println(animal.position);
             }
             map.nextDay();
             System.out.println(map);

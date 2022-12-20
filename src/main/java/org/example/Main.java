@@ -4,13 +4,15 @@ import elements.Grass;
 import elements.Vector2d;
 import maps.GlobeMap;
 import interfaces.IEngine;
+import maps.GreenBelt;
+import maps.ToxicFields;
 import simulation.SimulationEngine;
 import simulation.SimulationVariables;
 
 public class Main {
     public static void main(String[] args) {
-        SimulationVariables settings = new SimulationVariables(new GlobeMap(), new Grass(new Vector2d(1,1)),
-                10, 10, 30, 15 );
+        SimulationVariables settings = new SimulationVariables(new GlobeMap(), new ToxicFields(),
+                5, 5, 30, 15, 1 );
         Vector2d[] positions = { new Vector2d(2,2), new Vector2d(3,4), new Vector2d(2,2) };
         // Randomowe dane aby sprawdzic czy dziala
         IEngine engine = new SimulationEngine(settings, positions);

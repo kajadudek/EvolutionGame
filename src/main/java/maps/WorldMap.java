@@ -4,6 +4,7 @@ import elements.Animal;
 import elements.Grass;
 import elements.Vector2d;
 import interfaces.IMapType;
+import interfaces.IPlantFields;
 import interfaces.IWorldMap;
 import simulation.SimulationVariables;
 
@@ -17,24 +18,25 @@ public class WorldMap implements IWorldMap {
     List<Vector2d> emptyGreenBeltField = new ArrayList<>();
     List<Vector2d> emptyNonGreenField = new ArrayList<>();
     Map<Vector2d, Integer> deathCounter = new HashMap<>();
-    private int copulationEnergy, grassPerDay = 2, greenLowerY, greenUpperY;
+    int copulationEnergy, grassPerDay, greenLowerY, greenUpperY;
     private boolean growOnGreenBelt = true;
     protected int copulationLossEnergy;
     MapVisualizer mapVisualizer = new MapVisualizer(this);
     public int mapHeight;
     public int mapWidth;
     public IMapType map;
+    public IPlantFields greenFields;
     public final SimulationVariables settings;
-
-//    abstract public void animalMoveOnMap();
 
     public WorldMap(SimulationVariables settings) {
         this.settings = settings;
         this.mapHeight = settings.mapHeight;
         this.mapWidth = settings.mapWidth;
         this.map = (IMapType) settings.mapType;
+        this.greenFields = (IPlantFields) settings.plantFields;
+        this.grassPerDay = settings.grassPerDay;
 
-        calculateGreenBelt();
+        this.greenFields.calculateGreenFields(this);
     }
 
     public List<Animal> getAnimals() {
@@ -49,7 +51,6 @@ public class WorldMap implements IWorldMap {
     public void setCopulationLossEnergy(int copulationLossEnergy){
         this.copulationLossEnergy = copulationLossEnergy;
     }
-    public void setGrassPerDay(int grassPerDay) { this.grassPerDay = grassPerDay; }
 
     @Override
     public String toString(){
@@ -81,76 +82,13 @@ public class WorldMap implements IWorldMap {
         return null;
     }
 
-    /**
-     * Calculates 20% of map and its boundaries for green belt
-     */
-    private void calculateGreenBelt() {
-        int greenHeight = ((int)ceil(0.2 * (mapHeight+1) * (mapWidth+1))) / (mapWidth+1);
-
-        // If greenHeight(mod mapWidth) >=5 then adding one moge greenBelt would be closer to 20% of the map
-        if (((int)ceil(0.2 * (mapHeight+1) * (mapWidth+1))) % (mapWidth+1) >= 5) { greenHeight += 1;}
-
-        if ((mapHeight + 1)%2 == 0){
-            this.greenLowerY = (mapHeight + 1)/2 - greenHeight/2;
-        }else {
-            this.greenLowerY = (mapHeight)/2 - greenHeight/2;
-        }
-        this.greenUpperY = greenLowerY + greenHeight - 1;
-
-        //Initialize empty fields on greenBelt
-        for (int y = greenLowerY; y <= greenUpperY; y ++){
-            for (int x = 0; x <= mapWidth; x++) {
-                emptyGreenBeltField.add(new Vector2d(x,y));
-                deathCounter.put(new Vector2d(x,y), 0);
+    public boolean isGrassThere(Vector2d position) {
+        for (Grass grass : grasses) {
+            if (grass.getPosition().equals(position)) {
+                return true;
             }
         }
-
-        //Initialize empty fields outside greenBelt
-        for (int y = 0; y <= mapHeight; y ++){
-            if ((y >=0 && y < greenLowerY) || (y > greenUpperY && y <= mapHeight)){
-                for (int x = 0; x <= mapWidth; x++) {
-                    emptyNonGreenField.add(new Vector2d(x,y));
-                    deathCounter.put(new Vector2d(x,y), 0);
-                }
-            }
-        }
-    }
-
-    private void greenGrow(int greenPerDay) {
-        if (growOnGreenBelt) {
-            for (int x=0; x < greenPerDay; x++) {
-                int randomField = (int)(Math.random()*10);
-                // 20% chance to spawn Grass outside the green belt
-                if (randomField < 2) {
-                    if (emptyNonGreenField.size() > 0){
-                        Collections.shuffle(emptyNonGreenField);
-                        this.grasses.add(new Grass(emptyNonGreenField.get(0)));
-                        emptyNonGreenField.remove(0);
-                    } else {
-                        if(emptyGreenBeltField.size() > 0){
-                            Collections.shuffle(emptyGreenBeltField);
-                            this.grasses.add(new Grass(emptyGreenBeltField.get(0)));
-                            emptyGreenBeltField.remove(0);
-                        }
-                    }
-                // 80% chance to spawn Grass inside the green belt
-                }else {
-                    if(emptyGreenBeltField.size() > 0){
-                        Collections.shuffle(emptyGreenBeltField);
-                        this.grasses.add(new Grass(emptyGreenBeltField.get(0)));
-                        emptyGreenBeltField.remove(0);
-                    } else {
-                        if (emptyNonGreenField.size() > 0) {
-                            Collections.shuffle(emptyNonGreenField);
-                            this.grasses.add(new Grass(emptyNonGreenField.get(0)));
-                            emptyNonGreenField.remove(0);
-                        }
-                    }
-                }
-            }
-        } else {
-            // TODO - generate places from toxic fields
-        }
+        return false;
     }
 
     /**
@@ -240,6 +178,6 @@ public class WorldMap implements IWorldMap {
         removeAnimals();
         copulation();
         this.map.animalMoveOnMap(this);
-        greenGrow(this.grassPerDay);
+        this.greenFields.greenGrow(this, this.grassPerDay);
     }
 }
