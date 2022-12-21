@@ -1,11 +1,15 @@
 package simulation;
 
+import interfaces.IAnimalBehavior;
+import interfaces.IGenotypeMutation;
 import interfaces.IMapType;
 import interfaces.IPlantFields;
 
 public class SimulationVariables {
     public final IMapType mapType;
     public final IPlantFields plantFields;
+//    public final IAnimalBehavior animalBehavior;
+//    public final IGenotypeMutation genotypeMutation;
     public int mapHeight;
     public int mapWidth;
     public int copulationMinEnergy;

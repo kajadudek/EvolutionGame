@@ -19,7 +19,6 @@ public class WorldMap implements IWorldMap {
     List<Vector2d> emptyNonGreenField = new ArrayList<>();
     Map<Vector2d, Integer> deathCounter = new HashMap<>();
     int copulationEnergy, grassPerDay, greenLowerY, greenUpperY;
-    private boolean growOnGreenBelt = true;
     protected int copulationLossEnergy;
     MapVisualizer mapVisualizer = new MapVisualizer(this);
     public int mapHeight;

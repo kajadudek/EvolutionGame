@@ -5,6 +5,7 @@ import elements.Vector2d;
 import interfaces.IEngine;
 import maps.WorldMap;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SimulationEngine implements IEngine {
@@ -17,7 +18,13 @@ public class SimulationEngine implements IEngine {
         this.animals = map.getAnimals();
 
         for (Vector2d animalsPosition : animalsPositions) {
-            Animal animal = new Animal(animalsPosition, (int) (Math.random() * 40) + 20);
+
+            List<Integer> genotype = new ArrayList<>();
+            genotype.add(0);
+            genotype.add(0);
+            genotype.add(7);
+
+            Animal animal = new Animal(animalsPosition, (int) (Math.random() * 40) + 20, genotype);
             map.place(animal);
             System.out.println(animal.getPosition() + " " + animal.energy);
         }
@@ -31,7 +38,7 @@ public class SimulationEngine implements IEngine {
         for (int i=0; i < 10; i++){
             for(Animal animal: animals) {
 //                System.out.print(animal.position + " -> ");
-                animal.getPosition().y += 1;
+                animal.move();
 //                System.out.println(animal.position);
             }
             map.nextDay();

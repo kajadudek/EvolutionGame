@@ -23,13 +23,17 @@ public class GlobeMap implements IMapType {
             Vector2d position = animal.getPosition();
 
             if (animal.getPosition().x > mapWidth) {
-                animal.position = new Vector2d(0, position.y);
-            } else if (animal.getPosition().x < 0) {
-                animal.position = new Vector2d(mapWidth - 1, position.y);
-            } else if (position.y > mapHeight) {
-                animal.position = new Vector2d(position.x, 0);
-            } else if (position.y < 0) {
-                animal.position = new Vector2d(position.x, mapHeight - 1);
+                animal.position = new Vector2d(0, animal.position.y);
+            }
+            if (animal.getPosition().x < 0) {;
+                animal.position = new Vector2d(mapWidth, animal.position.y);
+            }
+            if (position.y > mapHeight) {
+                animal.position = new Vector2d(animal.position.x, 0);
+            }
+            if (position.y < 0) {
+                animal.position = new Vector2d(animal.position.x, mapHeight);
+
             }
         }
     }
