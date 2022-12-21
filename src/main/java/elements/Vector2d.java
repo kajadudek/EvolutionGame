@@ -24,7 +24,7 @@ public class Vector2d {
         return other.x >= this.x && other.y >= this.y;
     }
 
-    Vector2d add(Vector2d other) {
+    public Vector2d add(Vector2d other) {
         return new Vector2d(this.x + other.x, this.y + other.y);
     }
 

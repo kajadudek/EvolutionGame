@@ -3,6 +3,7 @@ package maps;
 import elements.Animal;
 import elements.Grass;
 import elements.Vector2d;
+import interfaces.IAnimalBehavior;
 import interfaces.IMapType;
 import interfaces.IPlantFields;
 import interfaces.IWorldMap;
@@ -25,6 +26,7 @@ public class WorldMap implements IWorldMap {
     public int mapWidth;
     public IMapType map;
     public IPlantFields greenFields;
+    public IAnimalBehavior animalBehavior;
     public final SimulationVariables settings;
 
     public WorldMap(SimulationVariables settings) {
@@ -34,6 +36,7 @@ public class WorldMap implements IWorldMap {
         this.map = (IMapType) settings.mapType;
         this.greenFields = (IPlantFields) settings.plantFields;
         this.grassPerDay = settings.grassPerDay;
+        this.animalBehavior = settings.animalBehavior;
 
         this.greenFields.calculateGreenFields(this);
     }
@@ -125,6 +128,7 @@ public class WorldMap implements IWorldMap {
                     //      creating child genome method
 
                     Animal child = new Animal(mother.getPosition(), childEnergy);
+                    child.setAnimalBehavior(this.animalBehavior);
 
                     this.place(child);
                     System.out.println("urodzil sie dziecior z energia: " + child.energy);

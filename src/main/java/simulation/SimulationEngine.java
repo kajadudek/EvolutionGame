@@ -25,6 +25,7 @@ public class SimulationEngine implements IEngine {
             genotype.add(7);
 
             Animal animal = new Animal(animalsPosition, (int) (Math.random() * 40) + 20, genotype);
+            animal.setAnimalBehavior(settings.animalBehavior);
             map.place(animal);
             System.out.println(animal.getPosition() + " " + animal.energy);
         }
