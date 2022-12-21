@@ -41,6 +41,48 @@ public class Animal {
         return this.energy;
     }
 
+    public void createGenotype(Animal mother, Animal father){
+        float suma = mother.getEnergy()+father.getEnergy();
+        int lenOfStrongerGenes;
+        Animal strongerParent, weakerParent;
+
+        this.genotype = new ArrayList<>();
+
+        // Select stronger parent
+        if (mother.getEnergy() >= father.getEnergy()) {
+            strongerParent = mother;
+            weakerParent = father;
+        } else {
+            strongerParent = father;
+            weakerParent = mother;
+        }
+
+        // Find how much genes stronger parent passes to child
+        lenOfStrongerGenes = Math.round(((float) ((strongerParent.getEnergy()) / suma) * (float) (strongerParent.genotype.size())));
+
+        // 0 - lenOfParentGenes right side strongerParents genes, 1 - left side genes
+        int strongerGenotypeOnLeft = (int)(Math.random()*2);
+
+        // If 0 - take right side stronger parents genes and pass it to right side of child genotype,
+        // If 1 - take left side stronger parents genes and pass it to left side of child genotype
+        if (strongerGenotypeOnLeft == 0){
+            for (int x=0; x<lenOfStrongerGenes; x++){
+                this.genotype.add(strongerParent.genotype.get(x));
+            }
+            for (int x=lenOfStrongerGenes; x<mother.genotype.size(); x++){
+                this.genotype.add(weakerParent.genotype.get(x));
+            }
+        } else {
+            for (int x=0; x<(mother.genotype.size() - lenOfStrongerGenes); x++){
+                this.genotype.add(weakerParent.genotype.get(x));
+            }
+            for (int x=(mother.genotype.size() - lenOfStrongerGenes); x<mother.genotype.size(); x++){
+                this.genotype.add(strongerParent.genotype.get(x));
+            }
+        }
+        System.out.println(this.genotype);
+    }
+
     /**
      * Handle moving animal according to its genotype. Classic version.
      */

@@ -3,10 +3,7 @@ package maps;
 import elements.Animal;
 import elements.Grass;
 import elements.Vector2d;
-import interfaces.IAnimalBehavior;
-import interfaces.IMapType;
-import interfaces.IPlantFields;
-import interfaces.IWorldMap;
+import interfaces.*;
 import simulation.SimulationVariables;
 
 import java.util.*;
@@ -27,6 +24,7 @@ public class WorldMap implements IWorldMap {
     public IMapType map;
     public IPlantFields greenFields;
     public IAnimalBehavior animalBehavior;
+    public IGenotypeMutation genotypeMutation;
     public final SimulationVariables settings;
 
     public WorldMap(SimulationVariables settings) {
@@ -37,6 +35,7 @@ public class WorldMap implements IWorldMap {
         this.greenFields = (IPlantFields) settings.plantFields;
         this.grassPerDay = settings.grassPerDay;
         this.animalBehavior = settings.animalBehavior;
+        this.genotypeMutation = settings.genotypeMutation;
 
         this.greenFields.calculateGreenFields(this);
     }
@@ -124,15 +123,13 @@ public class WorldMap implements IWorldMap {
                     mother.energy -= copulationLossEnergy;
                     father.energy -= copulationLossEnergy;
 
-                    //TODO - IN ANIMAL CLASS
-                    //      creating child genome method
-
                     Animal child = new Animal(mother.getPosition(), childEnergy);
                     child.setAnimalBehavior(this.animalBehavior);
+                    child.createGenotype(mother, father);
+                    this.genotypeMutation.genotypeMutation(child, this);
 
                     this.place(child);
-                    System.out.println("urodzil sie dziecior z energia: " + child.energy);
-                    System.out.println("z rodzicow: " + mother.energy + " " + father.energy);
+                    System.out.println("urodzil sie dziecior");
                 }
             }
         }
@@ -165,7 +162,6 @@ public class WorldMap implements IWorldMap {
                 System.out.println(this.animals);
             }
         }
-        //TODO - get places with the most animals' death counter. (Important for grass growth)
     }
 
     /**

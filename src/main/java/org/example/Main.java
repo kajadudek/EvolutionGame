@@ -1,6 +1,7 @@
 package org.example;
 
-import elements.AnimalElement.CrazyBehavior;
+import elements.AnimalElement.RandomMutation;
+import elements.AnimalElement.SmallMutation;
 import elements.Vector2d;
 import elements.AnimalElement.Predestination;
 import maps.GlobeMap;
@@ -12,8 +13,9 @@ import simulation.SimulationVariables;
 public class Main {
     public static void main(String[] args) {
         SimulationVariables settings = new SimulationVariables(new GlobeMap(), new ToxicFields(),
-                new CrazyBehavior(), 5, 5, 30, 15, 1 );
-        Vector2d[] positions = { new Vector2d(2,2), new Vector2d(3,4), new Vector2d(2,2) };
+                new Predestination(), new RandomMutation(), 5, 5, 30,
+                15, 1, 1, 1);
+        Vector2d[] positions = { new Vector2d(2,2), new Vector2d(3,4)};
         // Randomowe dane aby sprawdzic czy dziala
         IEngine engine = new SimulationEngine(settings, positions);
         engine.run();
