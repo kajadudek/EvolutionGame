@@ -269,6 +269,12 @@ public class WorldMap implements IWorldMap {
         }
 
         for (Grass grass: grassesToRemove){
+            if (grass.position.y <= this.greenUpperY && grass.position.y >= this.greenLowerY) {
+                this.emptyGreenBeltField.add(grass.position);
+            } else {
+                this.emptyNonGreenField.add(grass.position);
+            }
+
             this.grasses.remove(grass);
         }
     }
