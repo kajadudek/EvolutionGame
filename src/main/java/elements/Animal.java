@@ -1,8 +1,8 @@
 package elements;
 
+import elements.AnimalElement.MoveDirection;
 import interfaces.IAnimalBehavior;
-import simulation.SimulationEngine;
-import simulation.SimulationVariables;
+import maps.WorldMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,16 +11,18 @@ public class Animal {
     public Vector2d position;
     public int energy;
     private int idxOfGene;
-    MoveDirection orientation;
+    public int age;
+    public int childCounter;
+    public MoveDirection orientation;
     public List<Integer> genotype = new ArrayList<>();
     IAnimalBehavior animalBehavior;
 
     // First animals with random genotype
-    public Animal(Vector2d initialPosition, int energy, List<Integer> genotype){
+    public Animal(int energy){
         this.energy = energy;
-        this.position = initialPosition;
-        this.genotype = genotype;
         this.orientation = MoveDirection.N;
+        this.age = 0;
+        this.childCounter = 0;
     }
 
     // Animals that were born and inherit genotype from parents
@@ -28,12 +30,13 @@ public class Animal {
         this.energy = energy;
         this.position = initialPosition;
         this.orientation = MoveDirection.N;
+        this.age = 0;
+        this.childCounter = 0;
     }
 
     public void setAnimalBehavior(IAnimalBehavior animalBehavior) {
         this.animalBehavior = animalBehavior;
     }
-
     public Vector2d getPosition() {
         return this.position;
     }
@@ -41,6 +44,19 @@ public class Animal {
         return this.energy;
     }
 
+    // generate genotype for first animals on map
+    public void generateGenotype(int size){
+        for (int i=0; i<size; i++){
+            this.genotype.add((int)(Math.random()*8));
+        }
+    }
+
+    // generate random position for first animals on map
+    public void generatePosition(WorldMap map){
+        this.position = new Vector2d((int)(Math.random()*map.mapWidth), (int)(Math.random()*map.mapHeight));
+    }
+
+    // generate genotype for child of Animal mother and Animal father
     public void createGenotype(Animal mother, Animal father){
         float suma = mother.getEnergy()+father.getEnergy();
         int lenOfStrongerGenes;
@@ -80,11 +96,14 @@ public class Animal {
                 this.genotype.add(strongerParent.genotype.get(x));
             }
         }
+        mother.childCounter += 1;
+        father.childCounter += 1;
         System.out.println(this.genotype);
     }
 
     /**
-     * Handle moving animal according to its genotype. Classic version.
+     * Handle moving animal according to its genotype.
+     * Getting gene depends on IAnimalBehavior.
      */
     public void move(){
         // Get index of gene that will move the animal (depends on IAnimalBehavior variable)
@@ -130,6 +149,8 @@ public class Animal {
                 newVector = new Vector2d(-1,1);
             }
         }
+        this.energy -= 1;
+        this.age += 1;
         this.idxOfGene += 1;
         this.position = this.position.add(newVector);
     }

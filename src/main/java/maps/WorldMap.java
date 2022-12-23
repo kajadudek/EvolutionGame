@@ -2,13 +2,12 @@ package maps;
 
 import elements.Animal;
 import elements.Grass;
+import elements.ToxicField;
 import elements.Vector2d;
 import interfaces.*;
 import simulation.SimulationVariables;
 
 import java.util.*;
-
-import static java.lang.Math.ceil;
 
 public class WorldMap implements IWorldMap {
     protected List<Animal> animals = new ArrayList<>();
@@ -25,6 +24,7 @@ public class WorldMap implements IWorldMap {
     public IPlantFields greenFields;
     public IAnimalBehavior animalBehavior;
     public IGenotypeMutation genotypeMutation;
+    public int eatingEnergy;
     public final SimulationVariables settings;
 
     public WorldMap(SimulationVariables settings) {
@@ -36,6 +36,7 @@ public class WorldMap implements IWorldMap {
         this.grassPerDay = settings.grassPerDay;
         this.animalBehavior = settings.animalBehavior;
         this.genotypeMutation = settings.genotypeMutation;
+        this.eatingEnergy = settings.eatingEnergy;
 
         this.greenFields.calculateGreenFields(this);
     }
@@ -83,13 +84,85 @@ public class WorldMap implements IWorldMap {
         return null;
     }
 
-    public boolean isGrassThere(Vector2d position) {
+    public Object isGrassThere(Vector2d position) {
         for (Grass grass : grasses) {
             if (grass.getPosition().equals(position)) {
-                return true;
+                return grass;
             }
         }
-        return false;
+        return null;
+    }
+
+    /**
+     * Finds the strongest animal from the ones, that are on the same field.
+     * @param animalList
+     * @return
+     */
+    public Animal theStrongestAnimal(List<Animal> animalList){
+        int maxiEnergy = -1;
+        int maxiAge = -1;
+        int maxiChildren = -1;
+        List<Animal> resultList = new ArrayList<>();
+
+        if (animalList.size() == 1){
+            return animalList.get(0);
+        }
+
+        // find maximum energy from list of animals
+        for (Animal animal: animalList){
+            maxiEnergy = Math.max(maxiEnergy, animal.getEnergy());
+        }
+
+        // check which animals have max energy
+        for (Animal animal: animalList){
+            if (animal.energy == maxiEnergy){
+                System.out.println(animal.position + " " + animal.energy);
+                resultList.add(animal);
+            }
+        }
+
+        // if there is more than one animal with max energy, we compare its age
+        if (resultList.size() > 1){
+            animalList = new ArrayList<>();
+
+            // find maximum age from list of animals
+            for (Animal animal: resultList){
+                maxiAge = Math.max(maxiAge, animal.age);
+            }
+
+            for (Animal animal: resultList){
+                if (animal.age == maxiAge){
+                    animalList.add(animal);
+                }
+            }
+
+            // if there is more than one animal with max age, we compare its children
+            if (animalList.size() > 1){
+                resultList = new ArrayList<>();
+
+                // find maximum childrenCounter from list of animals
+                for (Animal animal: animalList){
+                    maxiChildren = Math.max(maxiChildren, animal.childCounter);
+                }
+
+                for (Animal animal: animalList){
+                    if (animal.childCounter == maxiChildren){
+                        resultList.add(animal);
+                    }
+                }
+
+                // if there is more than one animal with max children, we get the first one from the array
+                if (resultList.size() >= 1){
+                    return resultList.get(0);
+                }
+
+            } else if (animalList.size() == 1){
+                return animalList.get(0); }
+
+        } else if (resultList.size() == 1) {
+            return resultList.get(0); }
+
+        return null;
     }
 
     /**
@@ -110,13 +183,18 @@ public class WorldMap implements IWorldMap {
                     }
                 }
 
-                //TODO - IN ANIMAL CLASS
-                //      method in animal that determine which two objects (from arrayList of objects) will copulate
-                //      and which (only one) object can eat grass
-
                 if (possibleParents.size() >= 2){
-                    Animal mother = possibleParents.get(0);
-                    Animal father = possibleParents.get(1);
+                    Animal mother;
+                    Animal father;
+
+                    if (possibleParents.size() == 2) {
+                        mother = possibleParents.get(0);
+                        father = possibleParents.get(1);
+                    } else {
+                        mother = theStrongestAnimal(possibleParents);
+                        possibleParents.remove(mother);
+                        father = theStrongestAnimal(possibleParents);
+                    }
 
                     int childEnergy = copulationLossEnergy * 2;
 
@@ -129,7 +207,6 @@ public class WorldMap implements IWorldMap {
                     this.genotypeMutation.genotypeMutation(child, this);
 
                     this.place(child);
-                    System.out.println("urodzil sie dziecior");
                 }
             }
         }
@@ -152,7 +229,9 @@ public class WorldMap implements IWorldMap {
         for (Animal animal: animals) {
             if (animal.getEnergy() == 0) {
                 animalsToRemove.add(animal);
-                updateToxicFields(animal.getPosition());
+                if (this.greenFields instanceof ToxicFields) {
+                    updateToxicFields(animal.getPosition());
+                }
             }
         }
 
@@ -161,6 +240,36 @@ public class WorldMap implements IWorldMap {
                 this.animals.remove(animal);
                 System.out.println(this.animals);
             }
+        }
+    }
+
+    /**
+     * Handle eating grasses. Increase animal energy and removes grass from map.
+     */
+    public void eatGrass(){
+        List<Grass> grassesToRemove = new ArrayList<>();
+
+        for (Grass grass: grasses){
+            List<Animal> hungryAnimals = new ArrayList<>();
+            for (Animal animal: animals){
+                if (grass.getPosition().equals(animal.getPosition())){
+                    hungryAnimals.add(animal);
+                }
+            }
+
+            if (hungryAnimals.size()>1){
+                Animal animalWillEat = theStrongestAnimal(hungryAnimals);
+                animalWillEat.energy += this.eatingEnergy;
+                grassesToRemove.add(grass);
+            }
+            else if (hungryAnimals.size() == 1){
+                grassesToRemove.add(grass);
+                hungryAnimals.get(0).energy += this.eatingEnergy;
+            }
+        }
+
+        for (Grass grass: grassesToRemove){
+            this.grasses.remove(grass);
         }
     }
 
@@ -175,6 +284,10 @@ public class WorldMap implements IWorldMap {
     public void nextDay(){
         System.out.println("nastepny dzien");
         removeAnimals();
+        for(Animal animal: animals){
+            animal.move();
+        }
+        eatGrass();
         copulation();
         this.map.animalMoveOnMap(this);
         this.greenFields.greenGrow(this, this.grassPerDay);

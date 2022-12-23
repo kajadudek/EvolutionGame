@@ -14,14 +14,17 @@ public class SimulationVariables {
     public int mapWidth;
     public int copulationMinEnergy;
     public int copulationLossEnergy;
-    public int grassPerDay;
+    public int grassPerDay, eatingEnergy;
     public int minMutations, maxMutations;
+    public int animalsOnStart, startEnergy;
+    public int genotypeSize;
 
 
     public SimulationVariables(IMapType mapType, IPlantFields plantFields, IAnimalBehavior animalBehavior,
                                IGenotypeMutation genotypeMutation, int mapHeight, int mapWidth,
-                               int copulationMinEnergy, int copulationLossEnergy, int grassPerDay,
-                               int minMutations, int maxMutations) {
+                               int copulationMinEnergy, int copulationLossEnergy, int grassPerDay, int eatingEnergy,
+                               int minMutations, int maxMutations, int animalsOnStart, int startEnergy,
+                               int genotypeSize) {
         this.mapType = mapType;
         this.plantFields = plantFields;
         this.animalBehavior = animalBehavior;
@@ -31,7 +34,11 @@ public class SimulationVariables {
         this.copulationMinEnergy = copulationMinEnergy;
         this.copulationLossEnergy = copulationLossEnergy;
         this.grassPerDay = grassPerDay;
+        this.eatingEnergy = eatingEnergy;
         this.minMutations = minMutations;
         this.maxMutations = maxMutations;
+        this.animalsOnStart = animalsOnStart;
+        this.startEnergy = startEnergy;
+        this.genotypeSize = genotypeSize;
     }
 }

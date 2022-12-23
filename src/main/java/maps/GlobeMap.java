@@ -1,6 +1,7 @@
 package maps;
 
 import elements.Animal;
+import elements.AnimalElement.MoveDirection;
 import elements.Vector2d;
 import interfaces.IMapType;
 import simulation.SimulationVariables;
@@ -29,10 +30,12 @@ public class GlobeMap implements IMapType {
                 animal.position = new Vector2d(mapWidth, animal.position.y);
             }
             if (position.y > mapHeight) {
-                animal.position = new Vector2d(animal.position.x, 0);
+                animal.position = new Vector2d(animal.position.x, mapHeight);
+                animal.orientation = MoveDirection.S;
             }
             if (position.y < 0) {
-                animal.position = new Vector2d(animal.position.x, mapHeight);
+                animal.position = new Vector2d(animal.position.x, 0);
+                animal.orientation = MoveDirection.N;
 
             }
         }

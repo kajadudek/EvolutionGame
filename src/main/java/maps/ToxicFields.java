@@ -36,7 +36,7 @@ public class ToxicFields implements IPlantFields {
         for (Map.Entry<Vector2d, Integer> entry: deathCounter.entrySet()) {
             Vector2d key = entry.getKey();
             int val = entry.getValue();
-            if (!map.isGrassThere(key)){
+            if (!(map.isGrassThere(key) instanceof Grass)){
                 pq.add(new ToxicField(key, val));
             }
         }

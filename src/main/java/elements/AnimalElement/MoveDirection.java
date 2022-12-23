@@ -1,4 +1,4 @@
-package elements;
+package elements.AnimalElement;
 
 public enum MoveDirection {
     N,
