@@ -1,11 +1,9 @@
 package simulation;
 
 import elements.Animal;
-import elements.Vector2d;
 import interfaces.IEngine;
 import maps.WorldMap;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SimulationEngine implements IEngine {

@@ -1,13 +1,10 @@
 package maps;
 
-import elements.Animal;
 import elements.Grass;
 import elements.ToxicField;
 import elements.Vector2d;
 import interfaces.IPlantFields;
-
 import java.util.*;
-import java.util.stream.Stream;
 
 public class ToxicFields implements IPlantFields {
 

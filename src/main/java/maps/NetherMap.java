@@ -3,10 +3,8 @@ package maps;
 import elements.Animal;
 import elements.Vector2d;
 import interfaces.IMapType;
-import simulation.SimulationVariables;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Map that enables animals to cross the border and loose part of its energy and appear on randomly generated place.

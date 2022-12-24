@@ -1,8 +1,5 @@
 package elements;
 
-import interfaces.IPlantFields;
-import maps.WorldMap;
-
 public class Grass {
     public Vector2d position;
 

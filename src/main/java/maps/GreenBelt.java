@@ -4,7 +4,6 @@ import elements.Grass;
 import elements.Vector2d;
 import interfaces.IPlantFields;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 

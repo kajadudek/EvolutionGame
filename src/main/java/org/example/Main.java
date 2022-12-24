@@ -1,14 +1,6 @@
 package org.example;
 
-import elements.AnimalElement.RandomMutation;
-import elements.AnimalElement.SmallMutation;
-import elements.Vector2d;
-import elements.AnimalElement.Predestination;
-import maps.GlobeMap;
 import interfaces.IEngine;
-import maps.GreenBelt;
-import maps.NetherMap;
-import maps.ToxicFields;
 import org.json.simple.parser.ParseException;
 import simulation.SimulationEngine;
 import simulation.SimulationVariables;

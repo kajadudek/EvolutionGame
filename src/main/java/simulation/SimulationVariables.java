@@ -9,7 +9,6 @@ import interfaces.IGenotypeMutation;
 import interfaces.IMapType;
 import interfaces.IPlantFields;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -43,23 +42,23 @@ public class SimulationVariables {
             JSONObject jsonObj = (JSONObject) obj;
             String temp;
 
-            temp = ((String) jsonObj.get("mapType")).toString();
-            if (temp.toLowerCase().equals("globemap")){
+            temp = ((String) jsonObj.get("mapType"));
+            if (temp.equalsIgnoreCase("globemap")){
                 this.mapType = new GlobeMap();
             } else { this.mapType = new NetherMap(); }
 
-            temp = ((String) jsonObj.get("plantFields")).toString();
-            if (temp.toLowerCase().equals("greenbelt")){
+            temp = ((String) jsonObj.get("plantFields"));
+            if (temp.equalsIgnoreCase("greenbelt")){
                 this.plantFields = new GreenBelt();
             } else { this.plantFields = new ToxicFields(); }
 
-            temp = ((String) jsonObj.get("animalBehavior")).toString();
-            if (temp.toLowerCase().equals("predestination")){
+            temp = ((String) jsonObj.get("animalBehavior"));
+            if (temp.equalsIgnoreCase("predestination")){
                 this.animalBehavior = new Predestination();
             } else { this.animalBehavior = new CrazyBehavior(); }
 
-            temp = ((String) jsonObj.get("genotypeMutation")).toString();
-            if (temp.toLowerCase().equals("randommutation")){
+            temp = ((String) jsonObj.get("genotypeMutation"));
+            if (temp.equalsIgnoreCase("randommutation")){
                 this.genotypeMutation = new RandomMutation();
             } else { this.genotypeMutation = new SmallMutation(); }
 

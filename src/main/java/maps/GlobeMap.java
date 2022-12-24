@@ -4,10 +4,8 @@ import elements.Animal;
 import elements.AnimalElement.MoveDirection;
 import elements.Vector2d;
 import interfaces.IMapType;
-import simulation.SimulationVariables;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Map that enables animals to cross the border and appear on its opposite side.

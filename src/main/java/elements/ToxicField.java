@@ -1,7 +1,5 @@
 package elements;
 
-import maps.ToxicFields;
-
 public class ToxicField {
     public Vector2d position;
     public int deaths;

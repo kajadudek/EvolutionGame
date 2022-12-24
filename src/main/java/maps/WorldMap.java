@@ -2,7 +2,6 @@ package maps;
 
 import elements.Animal;
 import elements.Grass;
-import elements.ToxicField;
 import elements.Vector2d;
 import interfaces.*;
 import simulation.SimulationVariables;
@@ -18,13 +17,11 @@ public class WorldMap implements IWorldMap {
     int copulationEnergy, grassPerDay, greenLowerY, greenUpperY;
     protected int copulationLossEnergy;
     MapVisualizer mapVisualizer = new MapVisualizer(this);
-    public int mapHeight;
-    public int mapWidth;
+    public int mapHeight, mapWidth, eatingEnergy;
     public IMapType map;
     public IPlantFields greenFields;
     public IAnimalBehavior animalBehavior;
     public IGenotypeMutation genotypeMutation;
-    public int eatingEnergy;
     public final SimulationVariables settings;
 
     public WorldMap(SimulationVariables settings) {
