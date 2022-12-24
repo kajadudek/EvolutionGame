@@ -1,0 +1,17 @@
+{
+  "mapType": "GlobeMap",
+  "plantFields": "GreenBelt",
+  "animalBehavior": "Predestination",
+  "genotypeMutation": "RandomMutation",
+  "mapHeight": 5,
+  "mapWidth": 5,
+  "copulationMinEnergy": 30,
+  "copulationLossEnergy": 15,
+  "grassPerDay": 1,
+  "eatingEnergy": 5,
+  "minMutations": 1,
+  "maxMutations": 1,
+  "animalsOnStart": 4,
+  "startEnergy": 45,
+  "genotypeSize": 8
+}

@@ -9,15 +9,15 @@ import interfaces.IEngine;
 import maps.GreenBelt;
 import maps.NetherMap;
 import maps.ToxicFields;
+import org.json.simple.parser.ParseException;
 import simulation.SimulationEngine;
 import simulation.SimulationVariables;
 
+import java.io.IOException;
+
 public class Main {
-    public static void main(String[] args) {
-        SimulationVariables settings = new SimulationVariables(new NetherMap(), new GreenBelt(),
-                new Predestination(), new RandomMutation(), 7, 10, 30,
-                15, 1, 5,1, 1, 4,
-                45, 8);
+    public static void main(String[] args) throws IOException, ParseException {
+        SimulationVariables settings = new SimulationVariables();
         IEngine engine = new SimulationEngine(settings);
         engine.run();
     }
