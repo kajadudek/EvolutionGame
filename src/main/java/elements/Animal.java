@@ -6,6 +6,7 @@ import maps.WorldMap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Animal {
     public Vector2d position;
@@ -20,7 +21,7 @@ public class Animal {
     // First animals with random genotype
     public Animal(int energy){
         this.energy = energy;
-        this.orientation = MoveDirection.N;
+        this.orientation = MoveDirection.values()[new Random().nextInt(MoveDirection.values().length)];
         this.age = 0;
         this.childCounter = 0;
     }
@@ -29,7 +30,7 @@ public class Animal {
     public Animal(Vector2d initialPosition, int energy){
         this.energy = energy;
         this.position = initialPosition;
-        this.orientation = MoveDirection.N;
+        this.orientation = MoveDirection.values()[new Random().nextInt(MoveDirection.values().length)];
         this.age = 0;
         this.childCounter = 0;
     }
