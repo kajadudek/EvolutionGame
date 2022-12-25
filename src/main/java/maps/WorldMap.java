@@ -113,7 +113,6 @@ public class WorldMap implements IWorldMap {
         // check which animals have max energy
         for (Animal animal: animalList){
             if (animal.energy == maxiEnergy){
-                System.out.println(animal.position + " " + animal.energy);
                 resultList.add(animal);
             }
         }
@@ -235,7 +234,6 @@ public class WorldMap implements IWorldMap {
         if(animalsToRemove.size() > 0){
             for (Animal animal: animalsToRemove) {
                 this.animals.remove(animal);
-                System.out.println(this.animals);
             }
         }
     }

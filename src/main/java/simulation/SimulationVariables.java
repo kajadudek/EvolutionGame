@@ -43,24 +43,32 @@ public class SimulationVariables {
             String temp;
 
             temp = ((String) jsonObj.get("mapType"));
-            if (temp.equalsIgnoreCase("globemap")){
+            if (temp.equalsIgnoreCase("globemap")) {
                 this.mapType = new GlobeMap();
-            } else { this.mapType = new NetherMap(); }
+            } else {
+                this.mapType = new NetherMap();
+            }
 
             temp = ((String) jsonObj.get("plantFields"));
-            if (temp.equalsIgnoreCase("greenbelt")){
+            if (temp.equalsIgnoreCase("greenbelt")) {
                 this.plantFields = new GreenBelt();
-            } else { this.plantFields = new ToxicFields(); }
+            } else {
+                this.plantFields = new ToxicFields();
+            }
 
             temp = ((String) jsonObj.get("animalBehavior"));
-            if (temp.equalsIgnoreCase("predestination")){
+            if (temp.equalsIgnoreCase("predestination")) {
                 this.animalBehavior = new Predestination();
-            } else { this.animalBehavior = new CrazyBehavior(); }
+            } else {
+                this.animalBehavior = new CrazyBehavior();
+            }
 
             temp = ((String) jsonObj.get("genotypeMutation"));
-            if (temp.equalsIgnoreCase("randommutation")){
+            if (temp.equalsIgnoreCase("randommutation")) {
                 this.genotypeMutation = new RandomMutation();
-            } else { this.genotypeMutation = new SmallMutation(); }
+            } else {
+                this.genotypeMutation = new SmallMutation();
+            }
 
             this.mapHeight = ((Number) jsonObj.get("mapHeight")).intValue();
             this.mapWidth = ((Number) jsonObj.get("mapWidth")).intValue();
@@ -73,6 +81,27 @@ public class SimulationVariables {
             this.animalsOnStart = ((Number) jsonObj.get("animalsOnStart")).intValue();
             this.startEnergy = ((Number) jsonObj.get("startEnergy")).intValue();
             this.genotypeSize = ((Number) jsonObj.get("genotypeSize")).intValue();
+
+            this.validateSettings();
         }
+    }
+
+    private void validateSettings() throws IllegalArgumentException {
+        check(this.mapWidth, 1, "mapWidth");
+        check(this.mapHeight, 1, "mapHeight");
+        check(this.startEnergy, 0, "startEnergy");
+        check(this.minMutations, 0, "minMutations");
+        check(this.animalsOnStart, 1, "animalsOnStart");
+        check(this.maxMutations, this.minMutations, "maxMutations");
+        check(this.eatingEnergy, 1, "eatingEnergy");
+        check(this.grassPerDay, 0, "grassPerDay");
+        check(this.copulationLossEnergy, 1, "copulationLossEnergy");
+        check(this.copulationMinEnergy, this.copulationLossEnergy, "copulationMinEnergy");
+        check(this.genotypeSize, 1, "genotypeSize");
+    }
+
+    private void check(int variable, int requiredVariable, String name) {
+        if (variable < requiredVariable)
+            throw new IllegalArgumentException(name + " has to be equal or greater than: " + requiredVariable);
     }
 }

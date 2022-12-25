@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="elements.Vector2dTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2022-12-25T12:56:58" hostname="LAPTOP-SC094PN8" time="0.017">
+  <properties/>
+  <testcase name="addTest()" classname="elements.Vector2dTest" time="0.01"/>
+  <testcase name="precedesTest()" classname="elements.Vector2dTest" time="0.001"/>
+  <testcase name="equalsTest()" classname="elements.Vector2dTest" time="0.0"/>
+  <testcase name="toStringTest()" classname="elements.Vector2dTest" time="0.003"/>
+  <testcase name="subtractTest()" classname="elements.Vector2dTest" time="0.0"/>
+  <testcase name="followsTest()" classname="elements.Vector2dTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
