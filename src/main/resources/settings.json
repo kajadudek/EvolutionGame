@@ -3,15 +3,15 @@
   "plantFields": "GreenBelt",
   "animalBehavior": "Predestination",
   "genotypeMutation": "RandomMutation",
-  "mapHeight": 5,
-  "mapWidth": 5,
+  "mapHeight": 20,
+  "mapWidth": 20,
   "copulationMinEnergy": 30,
   "copulationLossEnergy": 15,
-  "grassPerDay": 1,
+  "grassPerDay": 2,
   "eatingEnergy": 5,
   "minMutations": 1,
   "maxMutations": 1,
-  "animalsOnStart": 4,
-  "startEnergy": 45,
-  "genotypeSize": 8
+  "animalsOnStart": 10,
+  "startEnergy": 100,
+  "genotypeSize": 10
 }

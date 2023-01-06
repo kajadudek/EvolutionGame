@@ -64,24 +64,27 @@ public class GreenBelt implements IPlantFields {
                 if (map.emptyNonGreenField.size() > 0){
                     Collections.shuffle(map.emptyNonGreenField);
                     grasses.add(new Grass(map.emptyNonGreenField.get(0)));
+                    map.grassesOnMap += 1;
                     map.emptyNonGreenField.remove(0);
                 } else {
                     if(map.emptyGreenBeltField.size() > 0){
                         Collections.shuffle(map.emptyGreenBeltField);
                         grasses.add(new Grass(map.emptyGreenBeltField.get(0)));
+                        map.grassesOnMap += 1;
                         map.emptyGreenBeltField.remove(0);
                     }
-                }
-                // 80% chance to spawn Grass inside the green belt
+                } // 80% chance to spawn Grass inside the green belt
             }else {
                 if(map.emptyGreenBeltField.size() > 0){
                     Collections.shuffle(map.emptyGreenBeltField);
                     grasses.add(new Grass(map.emptyGreenBeltField.get(0)));
+                    map.grassesOnMap += 1;
                     map.emptyGreenBeltField.remove(0);
                 } else {
                     if (map.emptyNonGreenField.size() > 0) {
                         Collections.shuffle(map.emptyNonGreenField);
                         grasses.add(new Grass(map.emptyNonGreenField.get(0)));
+                        map.grassesOnMap += 1;
                         map.emptyNonGreenField.remove(0);
                     }
                 }

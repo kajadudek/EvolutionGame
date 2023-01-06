@@ -34,7 +34,7 @@ public class NetherMap implements IMapType {
                     || oldPosition.y > mapHeight
                     || oldPosition.y < 0) {
                 animal.position = newPosition;
-                animal.energy = animal.energy - copulationLossEnergy;
+                animal.setEnergy(animal.getEnergy() - copulationLossEnergy);
             }
         }
     }

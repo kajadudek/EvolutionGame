@@ -1,0 +1,17 @@
+{
+  "mapType": "NetherMap",
+  "plantFields": "ToxicFields",
+  "animalBehavior": "CrazyBehavior",
+  "genotypeMutation": "SmallMutation",
+  "mapHeight": 20,
+  "mapWidth": 30,
+  "copulationMinEnergy": 40,
+  "copulationLossEnergy": 20,
+  "grassPerDay": 4,
+  "eatingEnergy": 10,
+  "minMutations": 3,
+  "maxMutations": 6,
+  "animalsOnStart": 12,
+  "startEnergy": 100,
+  "genotypeSize": 5
+}

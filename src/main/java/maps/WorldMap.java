@@ -4,6 +4,7 @@ import elements.Animal;
 import elements.Grass;
 import elements.Vector2d;
 import interfaces.*;
+import main.CsvWriter;
 import simulation.SimulationVariables;
 
 import java.util.*;
@@ -14,15 +15,28 @@ public class WorldMap implements IWorldMap {
     List<Vector2d> emptyGreenBeltField = new ArrayList<>();
     List<Vector2d> emptyNonGreenField = new ArrayList<>();
     Map<Vector2d, Integer> deathCounter = new HashMap<>();
+    public Map<List<Integer>, Integer> genotypes = new HashMap<>();
     int copulationEnergy, grassPerDay, greenLowerY, greenUpperY;
     protected int copulationLossEnergy;
     MapVisualizer mapVisualizer = new MapVisualizer(this);
-    public int mapHeight, mapWidth, eatingEnergy;
+    public int mapHeight, mapWidth, eatingEnergy, day;
     public IMapType map;
     public IPlantFields greenFields;
     public IAnimalBehavior animalBehavior;
     public IGenotypeMutation genotypeMutation;
     public final SimulationVariables settings;
+
+    // Stats
+    public int animalsOnMap = 0;
+    public int deadAnimals = 0;
+    public int grassesOnMap = 0;
+    public int emptyFields = 0;
+    private int animalsEnergySum = 0;
+    public int avgAnimalsEnergy = 0;
+    private int deadAnimalsAgeSum = 0;
+    public int avgDeadAnimalsAge = 0;
+    public CsvWriter toCSVWriter;
+
 
     public WorldMap(SimulationVariables settings) {
         this.settings = settings;
@@ -34,6 +48,9 @@ public class WorldMap implements IWorldMap {
         this.animalBehavior = settings.animalBehavior;
         this.genotypeMutation = settings.genotypeMutation;
         this.eatingEnergy = settings.eatingEnergy;
+        this.animalsOnMap = settings.animalsOnStart;
+        this.toCSVWriter = new CsvWriter();
+        this.day = 0;
 
         this.greenFields.calculateGreenFields(this);
     }
@@ -41,7 +58,8 @@ public class WorldMap implements IWorldMap {
     public List<Animal> getAnimals() {
         return animals;
     }
-    public List<Grass> getGrasses() { return grasses;}
+    public List<Grass> getGrasses() { return grasses; }
+    public List<List<Integer>> getPopularGenotypes() { return getMostPopularGenotype(); }
 
     public void setCopulationEnergy(int copulationEnergy) {
         this.copulationEnergy = copulationEnergy;
@@ -59,6 +77,11 @@ public class WorldMap implements IWorldMap {
     @Override
     public void place(Animal animal) {
         animals.add(animal);
+        if (genotypes.containsKey(animal.genotype)){
+            genotypes.put(animal.genotype, genotypes.get(animal.genotype) + 1);
+        } else {
+            genotypes.put(animal.genotype, 1);
+        }
     }
 
     @Override
@@ -99,6 +122,7 @@ public class WorldMap implements IWorldMap {
         int maxiEnergy = -1;
         int maxiAge = -1;
         int maxiChildren = -1;
+        Animal result = animalList.get(0);
         List<Animal> resultList = new ArrayList<>();
 
         if (animalList.size() == 1){
@@ -112,7 +136,7 @@ public class WorldMap implements IWorldMap {
 
         // check which animals have max energy
         for (Animal animal: animalList){
-            if (animal.energy == maxiEnergy){
+            if (animal.getEnergy() == maxiEnergy){
                 resultList.add(animal);
             }
         }
@@ -123,11 +147,11 @@ public class WorldMap implements IWorldMap {
 
             // find maximum age from list of animals
             for (Animal animal: resultList){
-                maxiAge = Math.max(maxiAge, animal.age);
+                maxiAge = Math.max(maxiAge, animal.getAge());
             }
 
             for (Animal animal: resultList){
-                if (animal.age == maxiAge){
+                if (animal.getAge() == maxiAge){
                     animalList.add(animal);
                 }
             }
@@ -138,11 +162,11 @@ public class WorldMap implements IWorldMap {
 
                 // find maximum childrenCounter from list of animals
                 for (Animal animal: animalList){
-                    maxiChildren = Math.max(maxiChildren, animal.childCounter);
+                    maxiChildren = Math.max(maxiChildren, animal.getChildCounter());
                 }
 
                 for (Animal animal: animalList){
-                    if (animal.childCounter == maxiChildren){
+                    if (animal.getChildCounter() == maxiChildren){
                         resultList.add(animal);
                     }
                 }
@@ -158,7 +182,7 @@ public class WorldMap implements IWorldMap {
         } else if (resultList.size() == 1) {
             return resultList.get(0); }
 
-        return null;
+        return result;
     }
 
     /**
@@ -173,7 +197,7 @@ public class WorldMap implements IWorldMap {
 
                 for(Animal animal: animals){
                     if (animal.getPosition().equals(currentPos)
-                            && animal.energy >= this.copulationEnergy){
+                            && animal.getEnergy() >= this.copulationEnergy){
 
                         possibleParents.add(animal);
                     }
@@ -194,8 +218,8 @@ public class WorldMap implements IWorldMap {
 
                     int childEnergy = copulationLossEnergy * 2;
 
-                    mother.energy -= copulationLossEnergy;
-                    father.energy -= copulationLossEnergy;
+                    mother.setEnergy(mother.getEnergy() - copulationLossEnergy);
+                    father.setEnergy(father.getEnergy() - copulationLossEnergy);
 
                     Animal child = new Animal(mother.getPosition(), childEnergy);
                     child.setAnimalBehavior(this.animalBehavior);
@@ -207,6 +231,8 @@ public class WorldMap implements IWorldMap {
             }
         }
     }
+
+
 
     /**
      * Updates number of deaths on certain position
@@ -223,7 +249,7 @@ public class WorldMap implements IWorldMap {
         List<Animal> animalsToRemove = new ArrayList<>();
 
         for (Animal animal: animals) {
-            if (animal.getEnergy() == 0) {
+            if (animal.getEnergy() <= 0) {
                 animalsToRemove.add(animal);
                 if (this.greenFields instanceof ToxicFields) {
                     updateToxicFields(animal.getPosition());
@@ -233,7 +259,15 @@ public class WorldMap implements IWorldMap {
 
         if(animalsToRemove.size() > 0){
             for (Animal animal: animalsToRemove) {
+                this.deadAnimalsAgeSum += animal.getAge();
+                // For most popular genotype stats
+                if (this.genotypes.get(animal.genotype) == 1){
+                    this.genotypes.remove(animal.genotype);
+                } else {
+                    this.genotypes.put(animal.genotype, genotypes.get(animal.genotype) - 1);
+                }
                 this.animals.remove(animal);
+                this.deadAnimals += 1;
             }
         }
     }
@@ -254,12 +288,14 @@ public class WorldMap implements IWorldMap {
 
             if (hungryAnimals.size()>1){
                 Animal animalWillEat = theStrongestAnimal(hungryAnimals);
-                animalWillEat.energy += this.eatingEnergy;
+                animalWillEat.setEnergy(animalWillEat.getEnergy() + this.eatingEnergy);
+                animalWillEat.grassesEaten += 1;
                 grassesToRemove.add(grass);
             }
             else if (hungryAnimals.size() == 1){
                 grassesToRemove.add(grass);
-                hungryAnimals.get(0).energy += this.eatingEnergy;
+                hungryAnimals.get(0).setEnergy(hungryAnimals.get(0).getEnergy() + this.eatingEnergy);
+                hungryAnimals.get(0).grassesEaten += 1;
             }
         }
 
@@ -271,6 +307,7 @@ public class WorldMap implements IWorldMap {
             }
 
             this.grasses.remove(grass);
+            this.grassesOnMap -= 1;
         }
     }
 
@@ -283,14 +320,103 @@ public class WorldMap implements IWorldMap {
      *  - grass growth
      */
     public void nextDay(){
-        System.out.println("nastepny dzien");
         removeAnimals();
-        for(Animal animal: animals){
-            animal.move();
-        }
+        this.day += 1;
+        this.animalsOnMap = 0;
+        this.animalsEnergySum = 0;
         eatGrass();
         copulation();
+        for(Animal animal: animals){
+            this.animalsOnMap += 1;
+            this.animalsEnergySum += animal.getEnergy();
+            animal.move();
+        }
         this.map.animalMoveOnMap(this);
         this.greenFields.greenGrow(this, this.grassPerDay);
+        this.getAvgAnimalsEnergy();
+        this.getEmptyFields();
+        this.getAvgDeadAnimalsAge();
+
+        if (!this.settings.fileToExportName.equals("")){
+            this.saveToCSV();
+        }
+    }
+
+    /**
+     * Handle stats count
+     */
+
+    private void getAvgAnimalsEnergy() {
+        if (this.animalsOnMap > 0){
+            this.avgAnimalsEnergy = this.animalsEnergySum/this.animalsOnMap;
+        } else {
+            this.avgAnimalsEnergy = 0;
+        }
+    }
+
+    private void getEmptyFields() {
+        int fieldsOnMap = (this.mapWidth + 1) * (this.mapHeight + 1);
+
+        for (int i=0; i <= this.mapWidth; i++) {
+            for (int j=0; j <= this.mapHeight; j++) {
+                Vector2d pos = new Vector2d(i,j);
+
+                if (this.objectAt(pos) != null) {
+                    fieldsOnMap -= 1;
+                }
+            }
+        }
+        this.emptyFields = fieldsOnMap;
+    }
+
+    private void getAvgDeadAnimalsAge() {
+        if (this.deadAnimals > 0){
+            this.avgDeadAnimalsAge= this.deadAnimalsAgeSum/this.deadAnimals;
+        } else {
+            this.avgDeadAnimalsAge = 0;
+        }
+    }
+
+    private List<List<Integer>> getMostPopularGenotype(){
+        int maxAnimalsWithTheSameGenotype = 0;
+        List<List<Integer>> mostPopularGenotypesList = new ArrayList<>();
+
+        for (Map.Entry<List<Integer>, Integer> entry : genotypes.entrySet()) {
+            maxAnimalsWithTheSameGenotype = Math.max(maxAnimalsWithTheSameGenotype, entry.getValue());
+        }
+
+        int howManyGenotypes = 0;
+        for (Map.Entry<List<Integer>, Integer> entry : genotypes.entrySet()) {
+            if (maxAnimalsWithTheSameGenotype == entry.getValue()){
+                mostPopularGenotypesList.add(entry.getKey());
+                howManyGenotypes += 1;
+            }
+            if (howManyGenotypes >=2 ){ break; }
+        }
+
+        return mostPopularGenotypesList;
+    }
+
+
+    /**
+     * Save stats to CSV file
+     */
+
+    private void saveToCSV(){
+        String secondGenotype = "none";
+        String secondGenotypeAnimals = "none";
+        if (this.getPopularGenotypes().size() > 1){
+            secondGenotype = this.getPopularGenotypes().get(1).toString();
+            secondGenotypeAnimals = String.valueOf(this.genotypes.get(this.getPopularGenotypes().get(1)));
+        }
+
+        String[] dailyStats = {String.valueOf(this.day), String.valueOf(this.animalsOnMap),
+                String.valueOf(this.grassesOnMap), String.valueOf(this.emptyFields),
+                this.getPopularGenotypes().get(0).toString(),
+                String.valueOf(this.genotypes.get(this.getPopularGenotypes().get(0))),
+                secondGenotype, secondGenotypeAnimals, String.valueOf(this.avgAnimalsEnergy),
+                String.valueOf(this.avgDeadAnimalsAge)};
+
+        toCSVWriter.createCsvData(dailyStats);
     }
 }
