@@ -67,6 +67,7 @@ public class ToxicFields implements IPlantFields {
             // Pick random grass from whereToGrow list
             int randIdx = (int)(Math.random()*whereToGrow.size());
             grasses.add(new Grass(whereToGrow.remove(randIdx).position));
+            map.grassesOnMap += 1;
 
             // Add them back to PQ
             while (!whereToGrow.isEmpty()){

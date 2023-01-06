@@ -15,7 +15,7 @@ class GlobeMapTest {
 
     @Test
     public void animalMoveOnMapTest() throws IOException, ParseException {
-        WorldMap map = new WorldMap(new SimulationVariables());
+        WorldMap map = new WorldMap(new SimulationVariables("settings.json"));
         Animal animal1 = new Animal(new Vector2d(map.mapWidth+1, 3), 30);
         Animal animal2 = new Animal(new Vector2d(2, map.mapHeight+1), 30);
         Animal animal3 = new Animal(new Vector2d(2, -1), 30);

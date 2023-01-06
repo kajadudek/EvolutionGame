@@ -21,10 +21,10 @@ import org.json.simple.parser.*;
 
 
 public class SimulationVariables {
-    public final IMapType mapType;
-    public final IPlantFields plantFields;
-    public final IAnimalBehavior animalBehavior;
-    public final IGenotypeMutation genotypeMutation;
+    public IMapType mapType;
+    public IPlantFields plantFields;
+    public IAnimalBehavior animalBehavior;
+    public IGenotypeMutation genotypeMutation;
     public int mapHeight;
     public int mapWidth;
     public int copulationMinEnergy;
@@ -33,11 +33,16 @@ public class SimulationVariables {
     public int minMutations, maxMutations;
     public int animalsOnStart, startEnergy;
     public int genotypeSize;
+    public String fileToExportName = "";
 
 
-    public SimulationVariables() throws IOException, IllegalArgumentException, ParseException {
+    public SimulationVariables(String filename) throws IOException, IllegalArgumentException, ParseException {
+        this.getSettings2(filename);
+    }
 
-        try (FileReader reader = new FileReader("src/main/resources/settings.json")) {
+    public void getSettings2(String fileName){
+
+        try (FileReader reader = new FileReader("src/main/resources/" + fileName)) {
             Object obj = new JSONParser().parse(reader);
             JSONObject jsonObj = (JSONObject) obj;
             String temp;
@@ -71,6 +76,7 @@ public class SimulationVariables {
             }
 
             this.mapHeight = ((Number) jsonObj.get("mapHeight")).intValue();
+
             this.mapWidth = ((Number) jsonObj.get("mapWidth")).intValue();
             this.copulationMinEnergy = ((Number) jsonObj.get("copulationMinEnergy")).intValue();
             this.copulationLossEnergy = ((Number) jsonObj.get("copulationLossEnergy")).intValue();
@@ -83,10 +89,12 @@ public class SimulationVariables {
             this.genotypeSize = ((Number) jsonObj.get("genotypeSize")).intValue();
 
             this.validateSettings();
+        } catch (IOException | ParseException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private void validateSettings() throws IllegalArgumentException {
+    public void validateSettings() throws IllegalArgumentException {
         check(this.mapWidth, 1, "mapWidth");
         check(this.mapHeight, 1, "mapHeight");
         check(this.startEnergy, 0, "startEnergy");
@@ -98,6 +106,12 @@ public class SimulationVariables {
         check(this.copulationLossEnergy, 1, "copulationLossEnergy");
         check(this.copulationMinEnergy, this.copulationLossEnergy, "copulationMinEnergy");
         check(this.genotypeSize, 1, "genotypeSize");
+        if (this.mapWidth > 58) {
+            this.mapWidth = 58;
+        }
+        if (this.mapHeight > 40) {
+            this.mapHeight = 40;
+        }
     }
 
     private void check(int variable, int requiredVariable, String name) {

@@ -16,23 +16,23 @@ import static org.junit.jupiter.api.Assertions.*;
 class WorldMapTest {
     @Test
     public void theStrongestAnimalTest() throws IOException, ParseException {
-        WorldMap map = new WorldMap(new SimulationVariables());
+        WorldMap map = new WorldMap(new SimulationVariables("settings.json"));
 
         Animal animal1 = new Animal(new Vector2d(2,2), 45);
-        animal1.childCounter = 4;
-        animal1.age = 3;
+        animal1.setChildCounter(4);
+        animal1.setAge(3);
 
         Animal animal2 = new Animal(new Vector2d(2,2), 45);
-        animal2.childCounter = 5;
-        animal2.age = 3;
+        animal2.setChildCounter(5);
+        animal2.setAge(3);
 
         Animal animal3 = new Animal(new Vector2d(2,2), 45);
-        animal3.childCounter = 4;
-        animal3.age = 13;
+        animal3.setChildCounter(4);
+        animal3.setAge(14);
 
         Animal animal4 = new Animal(new Vector2d(2,2), 46);
-        animal4.childCounter = 4;
-        animal4.age = 13;
+        animal4.setChildCounter(4);
+        animal4.setAge(13);
 
         map.place(animal1);
         map.place(animal2);
@@ -47,7 +47,7 @@ class WorldMapTest {
 
     @Test
     public void isGrassThereTest() throws IOException, ParseException {
-        WorldMap map = new WorldMap(new SimulationVariables());
+        WorldMap map = new WorldMap(new SimulationVariables("settings.json"));
 
         Grass grass = new Grass(new Vector2d(3,3));
         map.grasses.add(grass);
