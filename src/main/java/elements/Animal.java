@@ -14,8 +14,7 @@ public class Animal {
     public Vector2d position;
     public int grassesEaten, idxOfGene;
     private int age, energy, childCounter;
-    private boolean tracked = false;
-    private boolean hasPopularGenotype = false;
+    private boolean tracked = false, hasPopularGenotype = false;
     public MoveDirection orientation;
     public List<Integer> genotype = new ArrayList<>();
     IAnimalBehavior animalBehavior;
